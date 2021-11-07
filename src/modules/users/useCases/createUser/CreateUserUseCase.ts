@@ -1,3 +1,4 @@
+import { AppError } from "../../../../AppError";
 import { User } from "../../model/User";
 import { IUsersRepository } from "../../repositories/IUsersRepository";
 
@@ -7,10 +8,22 @@ interface IRequest {
 }
 
 class CreateUserUseCase {
-  constructor(private usersRepository: IUsersRepository) {}
+  // eslint-disable-next-line prettier/prettier
+  constructor(private usersRepository: IUsersRepository) { }
 
-  execute({ email, name }: IRequest): User {
-    // Complete aqui
+  public execute({ email, name }: IRequest): User {
+    const userAlreadyExists = this.usersRepository.findByEmail(email);
+
+    if (userAlreadyExists) {
+      throw new AppError("Already exists user with this email!");
+    }
+
+    const user = this.usersRepository.create({
+      name,
+      email,
+    });
+
+    return user;
   }
 }
 
